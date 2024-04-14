@@ -1,0 +1,242 @@
+> library(geomorph)
+Loading required package: RRPP
+Loading required package: rgl
+Loading required package: Matrix
+> datos_Hinf<-readland.tps("C:\\Users\\Lenovo\\Desktop\\Mand_\\p2p4derizqHinf - copia.tps")
+
+No specID provided; specimens will be numbered 1, 2, 3 ...
+
+No curves detected; all points appear to be fixed landmarks.
+> forma_gpa <- gpagen(datos_Hinf)
+
+Performing GPA
+  |============================| 100%
+
+Making projections... Finished!
+> print(forma_gpa)
+
+Call:
+gpagen(A = datos_Hinf) 
+
+
+
+Generalized Procrustes Analysis
+with Partial Procrustes Superimposition
+
+47 fixed landmarks
+0 semilandmarks (sliders)
+2-dimensional landmarks
+3 GPA iterations to converge
+
+
+Consensus (mean) Configuration
+
+              X             Y
+1  -0.252978959  2.260055e-03
+2  -0.237627635 -9.287563e-04
+3  -0.218014701 -1.949869e-05
+4  -0.195396579 -2.425776e-03
+5  -0.173965453  3.127441e-03
+6  -0.150622932 -6.288327e-03
+7  -0.132947501 -2.087035e-03
+8  -0.119018019  3.102284e-03
+9  -0.111999642  1.121950e-02
+10 -0.128794348  1.496652e-02
+11 -0.151665991  1.330362e-02
+12 -0.182219551  1.105764e-02
+13 -0.231888190  6.227689e-03
+14 -0.123341360 -1.082021e-02
+15 -0.099842524 -1.513155e-02
+16 -0.071392609 -1.560482e-02
+17 -0.042215378 -1.359844e-02
+18 -0.029295544 -7.561914e-03
+19 -0.019409212 -2.912822e-04
+20  0.001821149 -7.512314e-03
+21  0.022773477 -1.263479e-02
+22  0.036357804 -6.671308e-03
+23  0.047142259 -1.338792e-03
+24  0.058339112  3.842744e-03
+25  0.061306748  9.778378e-03
+26  0.030279388  1.144618e-02
+27 -0.012459068  7.916620e-03
+28 -0.051144127  4.213479e-03
+29 -0.087073882  1.070613e-03
+30 -0.114027894 -2.107288e-03
+31  0.053036727 -6.556843e-03
+32  0.073489125 -1.038795e-02
+33  0.102667518 -1.283382e-02
+34  0.134612031 -1.325258e-02
+35  0.151579615 -6.195796e-03
+36  0.161606527  4.240954e-03
+37  0.184228389 -1.047415e-03
+38  0.205412644 -6.498922e-03
+39  0.231435177 -1.061969e-02
+40  0.247940044 -2.420972e-03
+41  0.257286887  5.791672e-03
+42  0.254592886  1.248335e-02
+43  0.205634532  1.658969e-02
+44  0.145976398  1.501568e-02
+45  0.116945923  1.164331e-02
+46  0.088013833  5.424203e-03
+47  0.064862908  1.144892e-04
+> > forma_alineada <- data.frame(
++     Ejemplar = rep(1:dim(forma_gpa$coords)[3], each = dim(forma_gpa$coords)[1]),
++     Landmark = rep(1:dim(forma_gpa$coords)[1], dim(forma_gpa$coords)[3]),
++     X = as.vector(forma_gpa$coords[,1,]),
++     Y = as.vector(forma_gpa$coords[,2,])
++ )
+> > consenso_df <- data.frame(
++     Ejemplar = rep(0, nrow(forma_gpa$consensus)), # 0 para identificar que es el consenso
++     Landmark = 1:nrow(forma_gpa$consensus),
++     X = forma_gpa$consensus[,1],
++     Y = forma_gpa$consensus[,2]
++ )
+> > library(ggplot2)
+Use
+suppressPackageStartupMessages()
+to eliminate package startup
+messages
+> > ggplot(forma_total, aes(x = X, y = Y, group = Ejemplar, color = as.factor(Ejemplar))) +
++     geom_point() +
++     geom_path(alpha = 0.5) +
++     scale_color_manual(values = c("black", rainbow(dim(forma_gpa$coords)[3]))) +
++     coord_equal() +
++     theme_minimal() +
++     labs(title = "Visualización del Análisis de Procrustes", x = "Coordenada X", y = "Coordenada Y", color = "Ejemplar") +
++     theme(legend.position = "none")
+> > forma_total <- rbind(forma_alineada, consenso_df)
+> ggplot(forma_total, aes(x = X, y = Y, group = Ejemplar, color = as.factor(Ejemplar))) +
++     geom_point() +
++     geom_line(alpha = 0.5) +  # Opcional: conectar los puntos con líneas
++     coord_equal() +
++     theme_minimal() +
++     labs(title = "Visualización de Ejemplares", x = "Coordenada X", y = "Coordenada Y", color = "Ejemplar")
+> forma_total <- rbind(forma_alineada, consenso_df)
+> > ggplot(forma_total, aes(x = X, y = Y, group = Ejemplar, color = as.factor(Ejemplar))) +
++     geom_point(alpha = 0.5) +  # Puntos para las formas individuales
++     geom_point(data = consenso_df, aes(x = X, y = Y), color = "black", size = 3) +  # Puntos para la forma consenso
++     geom_path(alpha = 0.5) +  # Conectar puntos para las formas individuales
++     coord_equal() +
++     theme_minimal() +
++     labs(title = "Visualización del Análisis de Procrustes", x = "Coordenada X", y = "Coordenada Y", color = "Ejemplar") +
++     theme(legend.position = "none")
+> install.packages("plotly")
+WARNING: Rtools is required to build R packages but is not currently installed. Please download and install the appropriate version of Rtools before proceeding:
+
+https://cran.rstudio.com/bin/windows/Rtools/
+Installing package into ‘C:/Users/Lenovo/AppData/Local/R/win-library/4.3’
+(as ‘lib’ is unspecified)
+probando la URL 'https://cran.rstudio.com/bin/windows/contrib/4.3/plotly_4.10.4.zip'
+Content type 'application/zip' length 3258605 bytes (3.1 MB)
+downloaded 3.1 MB
+
+package ‘plotly’ successfully unpacked and MD5 sums checked
+
+The downloaded binary packages are in
+	C:\Users\Lenovo\AppData\Local\Temp\RtmpikJFCK\downloaded_packages
+> > library(ggplot2)
+> library(plotly)
+
+Attaching package: ‘plotly’
+
+The following object is masked from ‘package:ggplot2’:
+
+    last_plot
+
+The following object is masked from ‘package:stats’:
+
+    filter
+
+The following object is masked from ‘package:graphics’:
+
+    layout
+
+> p <- ggplot(data = forma_total, aes(x = X, y = Y, group = Ejemplar, color = as.factor(Ejemplar))) +
++     geom_path(alpha = 0.5) +
++     geom_point() +
++     scale_color_manual(values = c("black", rainbow(dim(forma_gpa$coords)[3]))) +
++     theme_minimal() +
++     labs(title = "Formas de los ejemplares y forma consenso") +
++     theme(legend.position = "none")
+> p_interactivo <- ggplotly(p)
+> > p_interactivo <- onRender(
++     p_interactivo,
++     "function(el, x, data) {
++     el.on('plotly_click', function(d) {
++       var ejemplar_seleccionado = d.points[0].pointNumber + 1;
++       Plotly.restyle(el.id, {
++         'visible': 'legendonly'
++       });
++       Plotly.restyle(el.id, {
++         'visible': true,
++         'mode': 'lines+markers'
++       }, [ejemplar_seleccionado]);
++     });
++   }"
++ )
+Error in onRender(p_interactivo, "function(el, x, data) {\n    el.on('plotly_click', function(d) {\n      var ejemplar_seleccionado = d.points[0].pointNumber + 1;\n      Plotly.restyle(el.id, {\n        'visible': 'legendonly'\n      });\n      Plotly.restyle(el.id, {\n        'visible': true,\n        'mode': 'lines+markers'\n      }, [ejemplar_seleccionado]);\n    });\n  }") : 
+  no se pudo encontrar la función "onRender"
+> library(htmlwidgets)
+> > p_interactivo <- onRender(
++     p_interactivo,
++     "function(el, x, data) {
++     el.on('plotly_click', function(d) {
++       var ejemplar_seleccionado = d.points[0].pointNumber + 1;
++       Plotly.restyle(el.id, {
++         'visible': 'legendonly'
++       });
++       Plotly.restyle(el.id, {
++         'visible': true,
++         'mode': 'lines+markers'
++       }, [ejemplar_seleccionado]);
++     });
++   }"
++ )
+> > p_interactivo
+> p_interactivo <- ggplotly(p, dynamicTicks = TRUE) %>% 
++     onRender(
++         "function(el, x) {
++       el.on('plotly_legendclick', function(d) {
++         var update = {};
++         var ejemplar = d.curveNumber;
++         update['visible[' + ejemplar + ']'] = (el.data[ejemplar].visible === 'legendonly') ? true : 'legendonly';
++         Plotly.restyle(el, update);
++       });
++     }"
++     )
+> 
+> library(shiny)
+> library(ggplot2)
+> ui <- fluidPage(
++     titlePanel("Selección de ejemplares"),
++     
++     sidebarLayout(
++         sidebarPanel(
++             selectInput("ejemplares", "Selecciona ejemplares:",
++                         choices = NULL, multiple = TRUE)
++         ),
++         
++         mainPanel(
++             plotOutput("plot")
++         )
++     )
++ )
+> server <- function(input, output, session) {
++     observe({
++         updateSelectInput(session, "ejemplares",
++                           choices = unique(forma_total$Ejemplar))
++     })
++ output$plot <- renderPlot({
++     ggplot(data = forma_total[forma_total$Ejemplar %in% input$ejemplares, ], 
++            aes(x = X, y = Y, group = Ejemplar, color = as.factor(Ejemplar))) +
++         geom_path(alpha = 0.5) +
++         geom_point() +
++         scale_color_manual(values = c("black", rainbow(length(unique(forma_total$Ejemplar))))) +
++         theme_minimal() +
++         labs(title = "Formas de los ejemplares y forma consenso") +
++         theme(legend.position = "none")
++ })
++ }
+> shinyApp(ui = ui, server = server)
+
+Listening on http://127.0.0.1:5666
